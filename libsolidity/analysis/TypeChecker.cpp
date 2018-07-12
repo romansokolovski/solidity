@@ -22,6 +22,7 @@
 
 #include <libsolidity/analysis/TypeChecker.h>
 #include <memory>
+#include <boost/algorithm/cxx11/all_of.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/algorithm/string/join.hpp>
 #include <boost/range/adaptor/reversed.hpp>
@@ -717,6 +718,7 @@ bool TypeChecker::visit(VariableDeclaration const& _variable)
 	// TypeChecker at the VariableDeclarationStatement level.
 	TypePointer varType = _variable.annotation().type;
 	solAssert(!!varType, "Failed to infer variable type.");
+
 	if (_variable.value())
 		expectType(*_variable.value(), *varType);
 	if (_variable.isConstant())
@@ -1087,10 +1089,18 @@ bool TypeChecker::visit(VariableDeclarationStatement const& _statement)
 	{
 		// No initial value is only permitted for single variables with specified type.
 		if (_statement.declarations().size() != 1 || !_statement.declarations().front())
-			m_errorReporter.fatalTypeError(_statement.location(), "Assignment necessary for type detection.");
+		{
+			// Error already reported in syntax checker, but we need to bail out here?
+			if (!boost::algorithm::all_of_equal(_statement.declarations(), nullptr))
+				m_errorReporter.fatalTypeError(_statement.location(), "Use of the \"var\" keyword is disallowed.");
+			else
+				return false;
+		}
+
 		VariableDeclaration const& varDecl = *_statement.declarations().front();
 		if (!varDecl.annotation().type)
-			m_errorReporter.fatalTypeError(_statement.location(), "Assignment necessary for type detection.");
+			m_errorReporter.fatalTypeError(_statement.location(), "Use of the \"var\" keyword is disallowed");
+
 		if (auto ref = dynamic_cast<ReferenceType const*>(type(varDecl).get()))
 		{
 			if (ref->dataStoredIn(DataLocation::Storage))
