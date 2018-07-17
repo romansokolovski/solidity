@@ -174,4 +174,5 @@ Contents
    common-patterns.rst
    bugs.rst
    contributing.rst
+   conduct.rst
    frequently-asked-questions.rst

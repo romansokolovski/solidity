@@ -64,6 +64,10 @@ ensure that it builds locally before submitting a pull request.
 
 Thank you for your help!
 
+Please note that this project is released with a 
+`Contributor Code of Conduct <https://solidity.readthedocs.io/en/latest/conduct.html>`_. 
+By participating in this project you agree to abide by its terms.
+
 Running the compiler tests
 ==========================
 
